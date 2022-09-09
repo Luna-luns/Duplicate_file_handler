@@ -2,6 +2,7 @@ import os
 import sys
 from directory_error import DirectoryError
 import ui
+import hashlib
 
 
 def get_directory():
@@ -41,6 +42,30 @@ ui.print_options()
 option = ui.get_option()
 
 if option == '1':
-    ui.print_duplicates(s_dict)
+    ui.print_duplicates({key: value for key, value in sorted(s_dict.items(), key=lambda item: item[0], reverse=True)})
 else:
     ui.print_duplicates({key: value for key, value in sorted(s_dict.items(), key=lambda item: item[0])})
+
+permission = ui.get_permission()
+
+if permission == 'yes':
+    hash_dict = {}
+    for key, value in s_dict.items():
+        for file in value:
+            with open(file, 'rb') as f:
+                f_hash = hashlib.md5(f.read(key)).hexdigest()
+
+                if hash_dict.get(key) is None:
+                    hash_dict[key] = {f_hash: [file]}
+                else:
+                    d = hash_dict[key]
+                    if f_hash in d:
+                        d[f_hash].append(file)
+                    else:
+                        d.update({f_hash: [file]})
+    if option == '1':
+        ui.print_hashes({key: value for key, value in sorted(hash_dict.items(), key=lambda item: item[0], reverse=True)})
+    else:
+        ui.print_hashes({key: value for key, value in sorted(hash_dict.items(), key=lambda item: item[0])})
+else:
+    exit()

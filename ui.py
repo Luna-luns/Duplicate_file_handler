@@ -21,6 +21,17 @@ def get_option() -> str:
             print_error(error)
 
 
+def get_permission() -> str:
+    while True:
+        try:
+            option = input('\n' + 'Check for duplicates?' + '\n').strip()
+            if option not in ('yes', 'no'):
+                raise OptionError
+            return option
+        except OptionError as error:
+            print(error)
+
+
 def print_error(error: Exception) -> None:
     print(error)
 
@@ -31,4 +42,18 @@ def print_duplicates(dupl: dict) -> None:
             print(f'\n{key} bytes')
             [print(value[i]) for i in range(len(value))]
         else:
-            exit()
+            continue
+
+
+def print_hashes(h_dict: dict) -> None:
+    count = 0
+    for key, value in h_dict.items():
+        print(f'\n{key} bytes')
+        for k, v in value.items():
+            if len(v) > 1:
+                print(f'Hash: {k}')
+                for i in range(len(v)):
+                    print(f'{count + 1}. {v[i]}')
+                    count += 1
+        else:
+            continue
