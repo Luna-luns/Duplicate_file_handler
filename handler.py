@@ -12,6 +12,34 @@ def get_directory():
         raise DirectoryError
 
 
+def get_count(ha_dict: dict) -> int:
+    count = 0
+    for key, value in ha_dict.items():
+        for k, v in value.items():
+            if len(v) > 1:
+                count += len(v)
+            else:
+                continue
+    return count
+
+
+def delete_files(nums: list, ha_dict: dict) -> int:
+    bytes_free = 0
+    count = 0
+    for key, value in ha_dict.items():
+        for k, v in value.items():
+            if len(v) > 1:
+                for i in range(len(v)):
+                    _file = f'{count + 1}. {v[i]}'.split('. ')
+                    if int(_file[0]) in nums:
+                        bytes_free += key
+                        os.remove(_file[1])
+                    count += 1
+            else:
+                continue
+    return bytes_free
+
+
 s_dict = {}
 try:
     args = get_directory()
@@ -47,9 +75,9 @@ else:
     ui.print_duplicates({key: value for key, value in sorted(s_dict.items(), key=lambda item: item[0])})
 
 permission = ui.get_permission()
-
+hash_dict = {}
 if permission == 'yes':
-    hash_dict = {}
+
     for key, value in s_dict.items():
         for file in value:
             with open(file, 'rb') as f:
@@ -67,5 +95,19 @@ if permission == 'yes':
         ui.print_hashes({key: value for key, value in sorted(hash_dict.items(), key=lambda item: item[0], reverse=True)})
     else:
         ui.print_hashes({key: value for key, value in sorted(hash_dict.items(), key=lambda item: item[0])})
+else:
+    exit()
+
+del_answer = ui.get_delete_answer()
+
+if del_answer == 'yes':
+    if option == '1':
+        h_dict = {key: value for key, value in sorted(hash_dict.items(), key=lambda item: item[0], reverse=True)}
+        numbers = ui.get_file_numbers(get_count(h_dict))
+        ui.print_freed_up_bytes(delete_files(numbers, h_dict))
+    else:
+        h_dict = {key: value for key, value in sorted(hash_dict.items(), key=lambda item: item[0])}
+        numbers = ui.get_file_numbers(get_count(h_dict))
+        ui.print_freed_up_bytes(delete_files(numbers, h_dict))
 else:
     exit()

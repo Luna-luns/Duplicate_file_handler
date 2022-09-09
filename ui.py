@@ -1,4 +1,5 @@
 from option_error import OptionError
+from format_error import FormatError
 
 
 def get_format() -> str:
@@ -32,6 +33,34 @@ def get_permission() -> str:
             print(error)
 
 
+def get_delete_answer() -> str:
+    while True:
+        try:
+            answer = input('\n' + 'Delete files?' + '\n').strip()
+            if answer not in ('yes', 'no'):
+                raise OptionError
+            return answer
+        except OptionError as error:
+            print(error)
+
+
+def get_file_numbers(count: int) -> list:
+    while True:
+        try:
+            numbers = input('\n' + 'Enter file numbers to delete:' + '\n')
+            if not numbers:
+                raise FormatError
+            numbers = numbers.strip().split(' ')
+            for n in numbers:
+                if not n.isdigit():
+                    raise FormatError
+                if not 1 <= int(n) <= count:
+                    raise FormatError
+            return [int(n) for n in numbers]
+        except FormatError as error:
+            print(error)
+
+
 def print_error(error: Exception) -> None:
     print(error)
 
@@ -55,5 +84,9 @@ def print_hashes(h_dict: dict) -> None:
                 for i in range(len(v)):
                     print(f'{count + 1}. {v[i]}')
                     count += 1
-        else:
-            continue
+            else:
+                continue
+
+
+def print_freed_up_bytes(b: int) -> None:
+    print(f'Total freed up space: {b} bytes')
